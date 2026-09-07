@@ -1,0 +1,48 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Patient {
+  id           Int           @id @default(autoincrement())
+  firstName    String        @map("first_name")
+  lastName     String        @map("last_name")
+  phone        String
+  dateOfBirth  DateTime      @map("date_of_birth") @db.Date
+  appointments Appointment[]
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime      @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@map("patients")
+}
+
+model Doctor {
+  id           Int           @id @default(autoincrement())
+  firstName    String        @map("first_name")
+  lastName     String        @map("last_name")
+  specialty    String
+  appointments Appointment[]
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime      @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@map("doctors")
+}
+
+model Appointment {
+  id              Int      @id @default(autoincrement())
+  patientId       Int      @map("patient_id")
+  doctorId        Int      @map("doctor_id")
+  appointmentDate DateTime @map("appointment_date") @db.Timestamp(6)
+  status          String
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  Patient Patient @relation(fields: [patientId], references: [id])
+  Doctor  Doctor  @relation(fields: [doctorId], references: [id])
+
+  @@map("appointments")
+}
